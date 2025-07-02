@@ -4,9 +4,12 @@ from pydantic import BaseModel
 from model import train_model
 from weather import fetch_weather_forecast
 import pandas as pd
+import os
+import uvicorn
 
 app = FastAPI()
-API_KEY = "YOUR_OPENWEATHERMAP_API_KEY"
+
+API_KEY = os.getenv("YOUR_API_KEY", "f76a546fc63ea2eb0bec6bbd196c0521")
 
 class PredictRequest(BaseModel):
     plant_code: str
@@ -14,6 +17,10 @@ class PredictRequest(BaseModel):
     cuaca_features: list
     city: str = "Probolinggo"
     days: int = 7
+
+@app.get("/")
+def root():
+    return {"message": "API Prediksi Efisiensi Siap Jalan di Railway"}
 
 @app.post("/predict")
 def predict_rendemen(request: PredictRequest):
@@ -33,3 +40,7 @@ def predict_rendemen(request: PredictRequest):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port)

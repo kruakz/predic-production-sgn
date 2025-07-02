@@ -30,7 +30,6 @@ def fetch_weather_forecast(city="Probolinggo", apikey="YOUR_API_KEY", fallback_d
     key = make_cache_key(city)
 
     if key in in_memory_cache:
-        print("[CACHE] Menggunakan in-memory cache")
         return in_memory_cache[key]
 
     cache_file = cache_filename(city)
@@ -40,10 +39,9 @@ def fetch_weather_forecast(city="Probolinggo", apikey="YOUR_API_KEY", fallback_d
                 data = json.load(f)
             df = pd.DataFrame(data)
             in_memory_cache[key] = df
-            print("[CACHE] Menggunakan cache file")
             return df
-        except Exception as e:
-            print(f"[WARNING] Gagal baca cache file: {e}")
+        except Exception:
+            pass
 
     try:
         url = f"https://api.openweathermap.org/data/2.5/forecast?q={city},id&appid={apikey}&units=metric"
@@ -70,11 +68,9 @@ def fetch_weather_forecast(city="Probolinggo", apikey="YOUR_API_KEY", fallback_d
             json.dump(df_grouped.to_dict(orient="records"), f)
 
         in_memory_cache[key] = df_grouped
-        print("[CACHE] Cuaca berhasil di-fetch dari API dan disimpan ke cache")
         return df_grouped
 
-    except Exception as e:
-        print(f"[WARNING] Gagal fetch cuaca dari API: {e}")
+    except Exception:
         fallback_data = [{
             "tanggal": (datetime.today().date() + pd.Timedelta(days=i)).strftime('%Y-%m-%d'),
             **DEFAULT_WEATHER
