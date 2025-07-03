@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from model import train_model
@@ -6,6 +5,7 @@ from weather import fetch_weather_forecast
 import pandas as pd
 import os
 import uvicorn
+import traceback
 
 app = FastAPI()
 
@@ -47,7 +47,8 @@ def predict_rendemen(request: PredictRequest):
         # Hitung statistik tambahan
         avg_pred = y_pred.mean()
         actual_mean = df[df['plant_code'].str.upper() == request.plant_code.upper()][request.target_col].mean()
-        percentage_prediction = round((avg_pred / actual_mean) * 100, 2) if actual_mean else None
+        percentage_prediction = round((avg_pred / actual_mean) * 100, 2) if actual_mean and actual_mean != 0 else None
+
 
         # Error estimasi (jika tersedia data aktual terakhir)
         if 'tanggal' in df.columns:
@@ -75,7 +76,12 @@ def predict_rendemen(request: PredictRequest):
         }
 
     except Exception as e:
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+    
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port)
 
 #def predict_rendemen(request: PredictRequest):
 #    try:
@@ -95,6 +101,4 @@ def predict_rendemen(request: PredictRequest):
 #    except Exception as e:
 #        raise HTTPException(status_code=500, detail=str(e))
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
-    uvicorn.run("main:app", host="0.0.0.0", port=port)
+
