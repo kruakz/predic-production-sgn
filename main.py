@@ -46,7 +46,7 @@ def predict_rendemen(request: PredictRequest):
 
         # Hitung statistik tambahan
         avg_pred = y_pred.mean()
-        actual_mean = df[df['plant_code'].str.upper() == request.plant_code.upper()][request.target_col].mean()
+        actual_mean = df[df['plant code'].str.upper() == request.plant_code.upper()][request.target_col].mean()
         percentage_prediction = round((avg_pred / actual_mean) * 100, 2) if actual_mean else None
 
         # Error estimasi (jika tersedia data aktual terakhir)
