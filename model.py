@@ -2,12 +2,12 @@
 import pandas as pd
 from xgboost import XGBRegressor
 
-def train_model(df, plant_code, target_col, cuaca_features):
+def train_model(df, plant_code, target_col, cuaca_features,col_features):
     df = df[df['plant_code'].str.upper() == plant_code.upper()]
     if df.empty:
         raise ValueError("Data untuk plant_code tidak ditemukan.")
 
-    all_cols = ['tgl_giling', target_col] + cuaca_features
+    all_cols = ['tgl_giling', target_col] + cuaca_features + col_features
     for col in all_cols:
         if col not in df.columns:
             raise ValueError(f"Kolom {col} tidak ditemukan di dataset.")
